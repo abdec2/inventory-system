@@ -47,7 +47,6 @@ const VerticalLayout = props => {
   const [isMounted, setIsMounted] = useState(false)
   const [menuVisibility, setMenuVisibility] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-
   // ** Store Vars
   const dispatch = useDispatch()
   const layoutStore = useSelector(state => state.layout)

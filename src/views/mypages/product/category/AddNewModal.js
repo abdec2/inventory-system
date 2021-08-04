@@ -1,9 +1,9 @@
 // ** React Imports
 import { useState } from 'react'
-
 // ** Third Party Components
 import Flatpickr from 'react-flatpickr'
-import { User, Briefcase, Mail, Calendar, DollarSign, X } from 'react-feather'
+import Select from 'react-select'
+import { User, Briefcase, Mail, Calendar, DollarSign, X, Feather } from 'react-feather'
 import {
   Button,
   Modal,
@@ -17,16 +17,55 @@ import {
   Label
 } from 'reactstrap'
 
+import { Formik, Field, Form, ErrorMessage, useFormik } from 'formik'
+import * as Yup from 'yup'
+
+const formSchema = Yup.object().shape({
+  category: Yup.string().required('Required'), 
+  parentCategory: Yup.string()
+})
+
 // ** Styles
 import '@styles/react/libs/flatpickr/flatpickr.scss'
+import CustomSelect from './CustomSelect'
 
-const AddNewModal = ({ open, handleModal }) => {
+const AddNewModal = ({ open, handleModal, categories, setCategories }) => {
   // ** State
   const [Picker, setPicker] = useState(new Date())
 
   // ** Custom close btn
   const CloseBtn = <X className='cursor-pointer' size={15} onClick={handleModal} />
 
+  const options = [{value: '', label: 'Select'}]
+
+  categories.forEach(item => {
+    if (!item.parentCategory) {
+      options.push({value: item.category, label: item.category})
+    }
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      category: '', 
+      parentCategory: ''
+    },
+    validationSchema: formSchema,
+    onSubmit: (values) => {
+      console.log(values)
+      const categoriesObj = {
+        id: categories.length + 1, 
+        category: values.category,
+        parent_category: (values.parentCategory !== '') ? values.parentCategory : null,
+        stock_qty: '0',
+        num_of_products: 0
+      }
+      setCategories([categoriesObj, ...categories])
+      handleModal()
+      formik.resetForm()
+    }
+  })
+
+   
   return (
     <Modal
       isOpen={open}
@@ -39,67 +78,37 @@ const AddNewModal = ({ open, handleModal }) => {
         <h5 className='modal-title'>New Category</h5>
       </ModalHeader>
       <ModalBody className='flex-grow-1'>
-        <FormGroup>
-          <Label for='full-name'>Full Name</Label>
-          <InputGroup>
-            <InputGroupAddon addonType='prepend'>
-              <InputGroupText>
-                <User size={15} />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Input id='full-name' placeholder='Bruce Wayne' />
-          </InputGroup>
-        </FormGroup>
-        <FormGroup>
-          <Label for='post'>Post</Label>
-          <InputGroup>
-            <InputGroupAddon addonType='prepend'>
-              <InputGroupText>
-                <Briefcase size={15} />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Input id='post' placeholder='Web Developer' />
-          </InputGroup>
-        </FormGroup>
-        <FormGroup>
-          <Label for='email'>Email</Label>
-          <InputGroup>
-            <InputGroupAddon addonType='prepend'>
-              <InputGroupText>
-                <Mail size={15} />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Input type='email' id='email' placeholder='brucewayne@email.com' />
-          </InputGroup>
-        </FormGroup>
-        <FormGroup>
-          <Label for='joining-date'>Joining Date</Label>
-          <InputGroup>
-            <InputGroupAddon addonType='prepend'>
-              <InputGroupText>
-                <Calendar size={15} />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Flatpickr className='form-control' id='joining-date' value={Picker} onChange={date => setPicker(date)} />
-          </InputGroup>
-        </FormGroup>
-        <FormGroup className='mb-4'>
-          <Label for='salary'>Salary</Label>
-          <InputGroup>
-            <InputGroupAddon addonType='prepend'>
-              <InputGroupText>
-                <DollarSign size={15} />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Input type='number' id='salary' />
-          </InputGroup>
-        </FormGroup>
-        <Button className='mr-1' color='primary' onClick={handleModal}>
-          Submit
-        </Button>
-        <Button color='secondary' onClick={handleModal} outline>
-          Cancel
-        </Button>
+        <form onSubmit={formik.handleSubmit}>
+          <FormGroup>
+            <Label for='category'>Category</Label>
+            <InputGroup>
+              <InputGroupAddon addonType='prepend'>
+                <InputGroupText>
+                  <Feather size={15} />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input id='category' className={`form-control ${formik.errors.category && 'is-invalid'}`} name='category' placeholder='Category' onChange={formik.handleChange} value={formik.values.category} />
+              
+            </InputGroup>
+          </FormGroup>
+          <FormGroup>
+            <Label for='parentCategory'>Parent Category</Label>
+            <CustomSelect 
+              options={options}
+              value={formik.values.parentCategory}
+              className={`react-select ${formik.errors.parentCategory && 'is-invalid'}` }
+              onChange={value => formik.setFieldValue('parentCategory', value.value)}
+            />
+            
+          </FormGroup>
+          <Button className='mr-1' color='primary' type='submit'>
+            Submit
+          </Button>
+          <Button color='secondary' onClick={handleModal} outline>
+            Cancel
+          </Button>
+
+        </form>
       </ModalBody>
     </Modal>
   )

@@ -40,9 +40,30 @@ const DataTableWithButtons = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [searchValue, setSearchValue] = useState('')
   const [filteredData, setFilteredData] = useState([])
+  
+  const [categories, setCategories] = useState(data)
+  
 
   // ** Function to handle Modal toggle
   const handleModal = () => setModal(!modal)
+  // const handleModal = () => {
+  //   const test = {
+  //     responsive_id: '',
+  //     id: categories.length + 1,
+  //     avatar: '10.jpg',
+  //     category: "azeem",
+  //     parent_category: 'Nuclear Power Engineer',
+  //     email: 'kocrevy0@thetimes.co.uk',
+  //     city: 'Krasnosilka',
+  //     start_date: '09/23/2016',
+  //     salary: '$23896.35',
+  //     stock_qty: '61',
+  //     experience: '1 Year',
+  //     num_of_products: 2
+  //   }
+
+  //   setCategories([...categories, test])
+  // }
 
   // ** Function to handle filter
   const handleFilter = e => {
@@ -50,33 +71,15 @@ const DataTableWithButtons = () => {
     let updatedData = []
     setSearchValue(value)
 
-    const status = {
-      1: { title: 'Current', color: 'light-primary' },
-      2: { title: 'Professional', color: 'light-success' },
-      3: { title: 'Rejected', color: 'light-danger' },
-      4: { title: 'Resigned', color: 'light-warning' },
-      5: { title: 'Applied', color: 'light-info' }
-    }
-
     if (value.length) {
       updatedData = data.filter(item => {
         const startsWith =
-          item.category.toLowerCase().startsWith(value.toLowerCase()) ||
-          item.parent_category.toLowerCase().startsWith(value.toLowerCase()) ||
-          item.email.toLowerCase().startsWith(value.toLowerCase()) ||
-          item.stock_qty.toLowerCase().startsWith(value.toLowerCase()) ||
-          item.salary.toLowerCase().startsWith(value.toLowerCase()) ||
-          item.start_date.toLowerCase().startsWith(value.toLowerCase()) ||
-          status[item.num_of_products].title.toLowerCase().startsWith(value.toLowerCase())
+          (item.category) ? item.category.toLowerCase().startsWith(value.toLowerCase()) : '' ||
+          (item.parent_category) ? item.parent_category.toLowerCase().startsWith(value.toLowerCase()) : '' 
 
         const includes =
-          item.category.toLowerCase().includes(value.toLowerCase()) ||
-          item.parent_category.toLowerCase().includes(value.toLowerCase()) ||
-          item.email.toLowerCase().includes(value.toLowerCase()) ||
-          item.stock_qty.toLowerCase().includes(value.toLowerCase()) ||
-          item.salary.toLowerCase().includes(value.toLowerCase()) ||
-          item.start_date.toLowerCase().includes(value.toLowerCase()) ||
-          status[item.num_of_products].title.toLowerCase().includes(value.toLowerCase())
+          (item.category) ? item.category.toLowerCase().includes(value.toLowerCase()) : '' ||
+          (item.parent_category) ? item.parent_category.toLowerCase().includes(value.toLowerCase()) : '' 
 
         if (startsWith) {
           return startsWith
@@ -101,7 +104,7 @@ const DataTableWithButtons = () => {
       nextLabel=''
       forcePage={currentPage}
       onPageChange={page => handlePagination(page)}
-      pageCount={searchValue.length ? filteredData.length / 7 : data.length / 7 || 1}
+      pageCount={searchValue.length ? filteredData.length / 7 : categories.length / 7 || 1}
       breakLabel='...'
       pageRangeDisplayed={2}
       marginPagesDisplayed={2}
@@ -174,11 +177,11 @@ const DataTableWithButtons = () => {
           sortIcon={<ChevronDown size={10} />}
           paginationDefaultPage={currentPage + 1}
           paginationComponent={CustomPagination}
-          data={searchValue.length ? filteredData : data}
+          data={searchValue.length ? filteredData : categories}
           selectableRowsComponent={BootstrapCheckbox}
         />
       </Card>
-      <AddNewModal open={modal} handleModal={handleModal} />
+      <AddNewModal open={modal} handleModal={handleModal} categories={categories} setCategories={setCategories} />
     </Fragment>
   )
 }
