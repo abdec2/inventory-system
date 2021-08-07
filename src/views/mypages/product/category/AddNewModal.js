@@ -17,7 +17,7 @@ import {
   Label
 } from 'reactstrap'
 
-import { Formik, Field, Form, ErrorMessage, useFormik } from 'formik'
+import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const formSchema = Yup.object().shape({
@@ -51,12 +51,11 @@ const AddNewModal = ({ open, handleModal, categories, setCategories }) => {
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      console.log(values)
       const categoriesObj = {
         id: categories.length + 1, 
         category: values.category,
         parent_category: (values.parentCategory !== '') ? values.parentCategory : null,
-        stock_qty: '0',
+        stock_qty: 0,
         num_of_products: 0
       }
       setCategories([categoriesObj, ...categories])
@@ -65,6 +64,10 @@ const AddNewModal = ({ open, handleModal, categories, setCategories }) => {
     }
   })
 
+  const handleCancel = () => {
+    formik.resetForm()
+    handleModal()
+  }
    
   return (
     <Modal
@@ -104,7 +107,7 @@ const AddNewModal = ({ open, handleModal, categories, setCategories }) => {
           <Button className='mr-1' color='primary' type='submit'>
             Submit
           </Button>
-          <Button color='secondary' onClick={handleModal} outline>
+          <Button color='secondary' onClick={handleCancel} outline>
             Cancel
           </Button>
 

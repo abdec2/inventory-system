@@ -49,12 +49,6 @@ const products = [
                 navLink: '/product/add'
             },
             {
-                id: 'import_products',
-                title: 'Import Products',
-                icon: <Circle size={20} />,
-                navLink: '/product/import'
-            },
-            {
                 id: 'adjustment-list',
                 title: 'Adjustment List',
                 icon: <Circle size={20} />,

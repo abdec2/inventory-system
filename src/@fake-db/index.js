@@ -1,5 +1,7 @@
 import mock from './mock'
 import './tables/datatables'
+import './tables/categories'
+import './tables/products'
 import './autoComplete/autoComplete'
 import './navbar/navbarSearch'
 import './apps/email'

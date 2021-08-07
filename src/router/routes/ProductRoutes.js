@@ -17,11 +17,6 @@ const ProductRoutes = [
         exact: true
     },
     {
-        path: '/product/import',
-        component: lazy(() => import('../../views/mypages/product/import')),
-        exact: true
-    },
-    {
         path: '/product/adjustment',
         component: lazy(() => import('../../views/mypages/product/adjustment')),
         exact: true
