@@ -16,14 +16,14 @@ const MyRoutes = [
         component: lazy(() => import('../../views/mypages/reports')),
         exact: true
     },
-    {
-        path: '/register',
-        component: lazy(() => import('../../views/pages/authentication/RegisterV2')),
-        layout: 'BlankLayout',
-        meta: {
-          authRoute: true
-        }
-    },
+    // {
+    //     path: '/register',
+    //     component: lazy(() => import('../../views/pages/authentication/RegisterV2')),
+    //     layout: 'BlankLayout',
+    //     meta: {
+    //       authRoute: true
+    //     }
+    // },
     {
         path: '/forgot-password',
         component: lazy(() => import('../../views/pages/authentication/ForgotPasswordV2.js')),
@@ -34,7 +34,7 @@ const MyRoutes = [
     },
     {
         path: '/login',
-        component: lazy(() => import('../../views/pages/authentication/Login')),
+        component: lazy(() => import('../../views/mypages/authentication/Login')),
         layout: 'BlankLayout',
         meta: {
           authRoute: true

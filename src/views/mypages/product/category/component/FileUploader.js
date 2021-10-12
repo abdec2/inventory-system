@@ -1,40 +1,66 @@
+
 import { useState } from 'react'
-import Uppy from '@uppy/core'
-import Tus from '@uppy/tus'
-import { DragDrop } from '@uppy/react'
-import { Card, CardHeader, CardTitle, CardBody, CardText, Button } from 'reactstrap'
+import { useDropzone } from 'react-dropzone'
+import axios from 'axios'
+import { Card, CardHeader, CardTitle, CardBody } from 'reactstrap'
+import { useHistory } from 'react-router'
 
-import 'uppy/dist/uppy.css'
-import '@uppy/status-bar/dist/style.css'
-import '@styles/react/libs/file-uploader/file-uploader.scss'
+export default function FileUploader({ handleModal }) {
+  const history = useHistory()
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    accept: '.csv',
+    maxFiles: 1,
+    onDrop: acceptedFiles => {
+      acceptedFiles.map(file => {
+        const formData = new FormData()
+        formData.append('file', file)
+        axios.post(`${process.env.REACT_APP_API_URL}/categories/import`, formData, {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(localStorage.getItem('userData')).jwt}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(res => {
+          history.push({
+            pathname: '/product/category/import',
+            importResult: res.data
+          })
+        })
 
-
-const FileUploader = ({handleModal}) => {
-  const uppy = new Uppy({
-    meta: { type: 'avatar' },
-    autoProceed: true,
-    debug: true,
-    restrictions: { maxNumberOfFiles: 1, allowedFileTypes: ['.csv'] }
+      })
+    }
   })
 
-  uppy
-  .use(Tus, {endpoint: '/categories/upload'}).on('complete', (results) => {
-      console.log(results)
-      handleModal()
-  })
+  const style = {
+    display: "flex",
+    justifyContent: 'space-around',
+    padding: '50px',
+    border: '2px dashed #7367f0',
+    marginBottom: '30px',
+    borderRadius: '0.5rem'
+  }
+  const thumbStyle = {
+    listStyle: 'none'
+
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle tag='h4'> Upload CSV File</CardTitle>
+        <CardTitle tag='h4'> Upload CSV</CardTitle>
       </CardHeader>
       <CardBody>
-        <DragDrop uppy={uppy} />
-        
+        <section className="container">
+          <div style={style} {...getRootProps({ className: 'dropzone' })}>
+            <input {...getInputProps()} />
+            <p style={{ margin: 0, textAlign:'center' }}>Drop files here or <span style={{ color: '#7367f0', fontWeight: 'bold', cursor: 'pointer' }}>browse</span></p>
+          </div>
+          {/* <div style={thumbStyle}>
+                        {files}
+                    </div> */}
+        </section>
       </CardBody>
 
     </Card>
+
   )
 }
-
-export default FileUploader

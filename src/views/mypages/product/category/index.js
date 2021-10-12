@@ -13,10 +13,17 @@ import DataTableWithButtons from './table'
 // ** Styles
 import '@styles/react/libs/tables/react-dataTable-component.scss'
 
+import { getCategories } from './store/actions'
+import { useDispatch } from 'react-redux'
+
+
 const index = () => {
-    useEffect(() => {
-        document.title = 'AB Sales Pro'
-    })
+  const dispatch = useDispatch()
+  useEffect(() => {
+    document.title = 'AB Sales Pro'
+    dispatch(getCategories())
+  }, [])
+
   return (
     <Fragment>
       <Breadcrumbs breadCrumbTitle='Product Category' breadCrumbParent='Products' breadCrumbActive='Product Category' />

@@ -1,9 +1,12 @@
 import { Fragment, useState, forwardRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import axios from 'axios'
+import Avatar from '@components/avatar'
+
 
 // import modals 
 import ImportProductModal from './ImportProductModal'
+import ViewProductModal from './ViewProductModal'
 
 // ** Third Party Components
 import ReactPaginate from 'react-paginate'
@@ -24,6 +27,9 @@ import {
     Row,
     Col
 } from 'reactstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteProduct } from './store/actions'
+import * as alert from '../../../myComponents/AlertMsgs'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef(({ onClick, ...rest }, ref) => (
@@ -33,28 +39,38 @@ const BootstrapCheckbox = forwardRef(({ onClick, ...rest }, ref) => (
     </div>
 ))
 
-let data
-axios.get('/api/products/all-data').then(res => {
-    data = res.data
-})
-
 const ProductTable = () => {
-    const [products, setProducts] = useState(data)
+    const dispatch = useDispatch()
+    const store = useSelector(state => state.products)
+    const products = store.products1
     const [currentPage, setCurrentPage] = useState(0)
     const [searchValue, setSearchValue] = useState('')
     const [filteredData, setFilteredData] = useState([])
     const [importModal, setImportModal] = useState(false)
-    console.log(data)
-    const handleViewProduct = pid => {
-        console.log(pid)
+    const [viewModal, setViewModal] = useState(false)
+    const [selectedRow, setSelectedRow] = useState([])
+
+
+    const handleViewModal = () => setViewModal(!viewModal)
+
+    const handleViewProduct = product => {
+        setSelectedRow(product)
+        handleViewModal()
     }
 
-    const handleEditProduct = pid => {
-        console.log(pid)
+    const history = useHistory()
+
+    const handleEditProduct = product => {
+        const routeUrl = `/product/edit/${product._id}`
+        history.push(routeUrl)
     }
 
-    const handleDeleteProduct = pid => {
-        console.log(pid)
+    const handleDeleteProduct = product => {
+        alert.handleConfirmText().then(result => {
+            if (result.value) {
+                dispatch(deleteProduct(product._id))
+            }
+        })
     }
 
     const handleImportModal = () => setImportModal(!importModal)
@@ -62,64 +78,100 @@ const ProductTable = () => {
     const columns = [
         {
             name: 'Image',
-            selector: 'imageUrl',
+            selector: 'product_image',
             sortable: true,
             minWidth: '50px',
             cell: row => (
-                <div className='d-flex align-items-center'>
-                    <div className=''>
-                        <img src={row.imageUrl} height="32" width="32" />
+                (row.product_image && (
+                    <div className='d-flex align-items-center'>
+                        <div className=''>
+                            <Avatar img={process.env.REACT_APP_API_URL + row.product_image.formats.thumbnail.url} size='lg' />
+                        </div>
                     </div>
-                </div>
+                ))
+            ),
+            center: true
+        },
+        {
+            name: 'Label',
+            selector: 'label',
+            sortable: true,
+            minWidth: '200px'
+        },
+        {
+            name: 'Product Type',
+            selector: 'product_type',
+            sortable: true,
+            minWidth: '200px',
+            center: true, 
+            cell: row => (
+                (row.product_type && (
+                    row.product_type.type
+                ))
             )
         },
         {
-            name: 'Name',
-            selector: 'name',
+            name: 'Variation of',
+            selector: 'parent_product',
             sortable: true,
-            minWidth: '200px'
+            minWidth: '200px',
+            cell: row => (
+                (row.parent_product) ? row.parent_product.sku : 'N/A'
+            ),
+            center: true
         },
         {
             name: 'SKU',
             selector: 'sku',
             sortable: true,
-            minWidth: '150px'
+            minWidth: '150px',
+            center: true
         },
         {
             name: 'Brand',
             selector: 'brand',
             sortable: true,
-            minWidth: '150px'
+            minWidth: '150px',
+            center: true
         },
         {
             name: 'Category',
-            selector: 'category',
+            selector: 'categories',
             sortable: true,
-            minWidth: '250px'
+            minWidth: '200px',
+            center: true, 
+            cell: row => (
+                (row.categories.length > 0) ? row.categories[0].category : 'N/A'
+            )
         },
         {
             name: 'Quantity',
             selector: 'qty',
             sortable: true,
-            minWidth: '50px'
+            minWidth: '50px',
+            center: true, 
+            cell: row => (
+                row.qty || 0
+            )
         },
         {
             name: 'Unit',
             selector: 'unit',
             sortable: true,
-            minWidth: '100px'
+            minWidth: '100px',
+            center: true, 
+            cell: row => (
+                row.unit && (
+                    row.unit.unit
+                )
+            )
         },
         {
             name: 'Price',
             selector: 'price',
             sortable: true,
-            minWidth: '100px'
-        },
-        {
-            name: 'Cost',
-            selector: 'cost',
-            sortable: true,
-            minWidth: '100px'
+            minWidth: '100px',
+            center: true
         },
         {
             name: 'Actions',
@@ -133,15 +185,15 @@ const ProductTable = () => {
                                 <MoreVertical size={15} />
                             </DropdownToggle>
                             <DropdownMenu right>
-                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleViewProduct(row.id) }}>
+                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleViewProduct(row) }}>
                                     <Eye size={15} />
                                     <span className='align-middle ml-50'>View</span>
                                 </DropdownItem>
-                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleEditProduct(row.id) }}>
+                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleEditProduct(row) }}>
                                     <Edit size={15} />
                                     <span className='align-middle ml-50'>Edit</span>
                                 </DropdownItem>
-                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleDeleteProduct(row.id) }}>
+                                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleDeleteProduct(row) }}>
                                     <Trash size={15} />
                                     <span className='align-middle ml-50'>Delete</span>
                                 </DropdownItem>
@@ -197,21 +249,20 @@ const ProductTable = () => {
         link.setAttribute('download', filename)
         link.click()
     }
-
     const handleFilter = e => {
         const value = e.target.value
         let updatedData = []
         setSearchValue(value)
 
         if (value.length) {
-            updatedData = data.filter(item => {
+            updatedData = products.filter(item => {
                 const startsWith =
-                    (item.category) ? item.category.toLowerCase().startsWith(value.toLowerCase()) : '' ||
-                        (item.parent_category) ? item.parent_category.toLowerCase().startsWith(value.toLowerCase()) : ''
+                item.sku.toLowerCase().startsWith(value.toLowerCase()) ||
+                item.label.toLowerCase().startsWith(value.toLowerCase())
 
                 const includes =
-                    (item.category) ? item.category.toLowerCase().includes(value.toLowerCase()) : '' ||
-                        (item.parent_category) ? item.parent_category.toLowerCase().includes(value.toLowerCase()) : ''
+                    item.sku.toLowerCase().includes(value.toLowerCase()) ||
+                    item.label.toLowerCase().includes(value.toLowerCase())
 
                 if (startsWith) {
                     return startsWith
@@ -314,6 +365,7 @@ const ProductTable = () => {
                 />
             </Card>
             <ImportProductModal open={importModal} handleModal={handleImportModal} />
+            <ViewProductModal open={viewModal} handleModal={handleViewModal} selectedRow={selectedRow} />
 
         </Fragment>
     )

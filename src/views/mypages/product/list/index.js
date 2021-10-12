@@ -7,13 +7,18 @@ import ProductTable from './ProductTable'
 // ** Third Party Components
 import { Row, Col, Button } from 'reactstrap'
 
-
 // ** Styles
 import '@styles/react/libs/tables/react-dataTable-component.scss'
 
+import { getProducts } from './store/actions'
+import { useDispatch } from 'react-redux'
+
+
 const index = () => {
+    const dispatch = useDispatch()
     useEffect(() => {
         document.title = 'AB Sales Pro'
+        dispatch(getProducts())
     })
   return (
     <Fragment>

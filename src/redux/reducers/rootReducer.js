@@ -13,6 +13,9 @@ import invoice from '@src/views/apps/invoice/store/reducer'
 import calendar from '@src/views/apps/calendar/store/reducer'
 import ecommerce from '@src/views/apps/ecommerce/store/reducer'
 import dataTables from '@src/views/tables/data-tables/store/reducer'
+import categories from '../../views/mypages/product/category/store/reducer'
+import products from '../../views/mypages/product/list/store/reducer'
+import adjustments from '../../views/mypages/product/adjustment/store/reducer'
 
 const rootReducer = combineReducers({
   auth,
@@ -25,7 +28,10 @@ const rootReducer = combineReducers({
   invoice,
   calendar,
   ecommerce,
-  dataTables
+  dataTables,
+  categories,
+  products, 
+  adjustments
 })
 
 export default rootReducer

@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState, forwardRef } from 'react'
+import { Fragment, useState, forwardRef, useEffect } from 'react'
 import axios from 'axios'
 // ** Table Data & Columns
 // import { data } from '../../../tables/data-tables/data'
@@ -28,6 +28,9 @@ import {
   Row,
   Col
 } from 'reactstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteCategory } from './store/actions'
+import * as alert from './../../../myComponents/AlertMsgs'
 
 // ** Bootstrap Checkbox Component
 const BootstrapCheckbox = forwardRef(({ onClick, ...rest }, ref) => (
@@ -37,14 +40,10 @@ const BootstrapCheckbox = forwardRef(({ onClick, ...rest }, ref) => (
   </div>
 ))
 
-let data
-
-axios.get('/api/categories/initial-data').then(response => {
-  data = response.data
-})
-
 const DataTableWithButtons = () => {
 
+  const store = useSelector(state => state.categories)
+  const dispatch = useDispatch()
   // ** States
   const [modal, setModal] = useState(false)
   const [importModal, setImportModal] = useState(false)
@@ -53,22 +52,27 @@ const DataTableWithButtons = () => {
   const [searchValue, setSearchValue] = useState('')
   const [filteredData, setFilteredData] = useState([])
 
-  const [categories, setCategories] = useState(data)
+  const categories = store.categories
   const [selectedRow, setSelectedRow] = useState([])
 
-
+  
   // ** Function to handle Modal toggle
   const handleModal = () => setModal(!modal)
   const handleImportModal = () => setImportModal(!importModal)
   const handleEditModal = () => setEditModal(!EditModal)
 
   const handleDelete = id => {
-    setCategories(categories.filter(category => category.id !== id))
-
+    // setCategories(categories.filter(category => category.id !== id))
+    // console.log(id)
+    alert.handleConfirmText().then(result => {
+      if (result.value) {
+        dispatch(deleteCategory(id))
+      }
+    })
   }
 
   const handleEdit = id => {
-    const editRow = categories.filter(category => category.id === id)
+    const editRow = categories.filter(category => category._id === id)
     setSelectedRow(editRow)
     handleEditModal()
   }
@@ -85,27 +89,34 @@ const DataTableWithButtons = () => {
             <span className='d-block font-weight-bold text-truncate'>{row.category}</span>
           </div>
         </div>
-      )
+      ),
+      center: true
     },
     {
       name: 'Parent Category',
       selector: 'parent_category',
       sortable: true,
-      minWidth: '250px'
+      minWidth: '250px', 
+      center: true, 
+      cell: row => {
+        if (row.parent_category) {
+          return row.parent_category.category
+        } else {
+          return 'N/A'
+        }
+      }
     },
     {
       name: 'Number of Products',
-      selector: 'num_of_products',
+      selector: 'number_of_product',
       sortable: true,
-      minWidth: '150px'
+      minWidth: '150px', 
+      center: true, 
+      cell: row => (
+        row.products.length
+      )
     },
 
-    {
-      name: 'Stock Quantity',
-      selector: 'stock_qty',
-      sortable: true,
-      minWidth: '150px'
-    },
     {
       name: 'Actions',
       allowOverflow: true,
@@ -117,11 +128,11 @@ const DataTableWithButtons = () => {
                 <MoreVertical size={15} />
               </DropdownToggle>
               <DropdownMenu right>
-                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleEdit(row.id) }}>
+                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleEdit(row._id) }}>
                   <Edit size={15} />
                   <span className='align-middle ml-50'>Edit</span>
                 </DropdownItem>
-                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleDelete(row.id) }}>
+                <DropdownItem tag='a' href='/' className='w-100' onClick={e => { e.preventDefault(); handleDelete(row._id) }}>
                   <Trash size={15} />
                   <span className='align-middle ml-50'>Delete</span>
                 </DropdownItem>
@@ -130,7 +141,8 @@ const DataTableWithButtons = () => {
 
           </div>
         )
-      }
+      }, 
+      center: true
     }
   ]
 
@@ -185,7 +197,7 @@ const DataTableWithButtons = () => {
     setSearchValue(value)
 
     if (value.length) {
-      updatedData = data.filter(item => {
+      updatedData = store.categories.filter(item => {
         const startsWith =
           (item.category) ? item.category.toLowerCase().startsWith(value.toLowerCase()) : '' ||
             (item.parent_category) ? item.parent_category.toLowerCase().startsWith(value.toLowerCase()) : ''
@@ -283,7 +295,7 @@ const DataTableWithButtons = () => {
         <DataTable
           noHeader
           pagination
-          selectableRows
+          // selectableRows
           columns={columns}
           paginationPerPage={7}
           className='react-dataTable'
@@ -291,11 +303,11 @@ const DataTableWithButtons = () => {
           paginationDefaultPage={currentPage + 1}
           paginationComponent={CustomPagination}
           data={searchValue.length ? filteredData : categories}
-          selectableRowsComponent={BootstrapCheckbox}
+          // selectableRowsComponent={BootstrapCheckbox}
         />
       </Card>
-      <AddNewModal open={modal} handleModal={handleModal} categories={categories} setCategories={setCategories} />
-      <EditCategoryModal open={EditModal} handleModal={handleEditModal} categories={categories} setCategories={setCategories} selectedRow={selectedRow} />
+      <AddNewModal open={modal} handleModal={handleModal} />
+      <EditCategoryModal open={EditModal} handleModal={handleEditModal} selectedRow={selectedRow} />
       <ImportCatModel open={importModal} handleModal={handleImportModal} />
 
     </Fragment>

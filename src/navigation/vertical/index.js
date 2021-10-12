@@ -53,6 +53,12 @@ const products = [
                 title: 'Adjustment List',
                 icon: <Circle size={20} />,
                 navLink: '/product/adjustment'
+            }, 
+            {
+                id: 'add-adjustment',
+                title: 'Add Adjustment',
+                icon: <Circle size={20} />,
+                navLink: '/product/adjustment/add'
             }
         ]
     }
@@ -189,15 +195,18 @@ const quotation = [
                 id: 'list-quotation',
                 title: 'List Quotation',
                 icon: <Circle size={20} />,
-                navLink: '/quotation/list'
+                navLink: '/quotation/list',
+                disabled: true
             }, 
             {
                 id: 'add-quotation',
                 title: 'Add Quotation',
                 icon: <Circle size={20} />,
-                navLink: '/quotation/add'
+                navLink: '/quotation/add',
+                disabled: true
             }
         ]
+
     }
 ]
 
@@ -290,7 +299,8 @@ const report = [
         id: 'reports',
         title: 'Reports',
         icon: <FileText size={20} />,
-        navLink: '/reports'
+        navLink: '/reports', 
+        disabled: true
     }
 ]
 

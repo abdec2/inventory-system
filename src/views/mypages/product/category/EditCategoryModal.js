@@ -1,8 +1,6 @@
 // ** React Imports
 import { useState, useEffect } from 'react'
 // ** Third Party Components
-import Flatpickr from 'react-flatpickr'
-import Select from 'react-select'
 import { User, Briefcase, Mail, Calendar, DollarSign, X, Feather } from 'react-feather'
 import {
     Button,
@@ -22,14 +20,20 @@ import * as Yup from 'yup'
 
 const formSchema = Yup.object().shape({
     category: Yup.string().required('Required'),
-    parentCategory: Yup.string()
+    parentCategory: Yup.string().nullable()
 })
 
 // ** Styles
 import '@styles/react/libs/flatpickr/flatpickr.scss'
 import CustomSelect from './CustomSelect'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateCategory } from './store/actions'
 
-const EditCategoryModal = ({ open, handleModal, categories, setCategories, selectedRow }) => {
+const EditCategoryModal = ({ open, handleModal, selectedRow }) => {
+    
+    const dispatch = useDispatch()
+    const store = useSelector(state => state.categories)
+    const categories = store.categories
 
     // ** Custom close btn
     const CloseBtn = <X className='cursor-pointer' size={15} onClick={handleModal} />
@@ -37,8 +41,11 @@ const EditCategoryModal = ({ open, handleModal, categories, setCategories, selec
     const options = [{ value: '', label: 'Select' }]
 
     categories.forEach(item => {
-        if (!item.parentCategory) {
-            options.push({ value: item.category, label: item.category })
+        if (selectedRow.length > 0 && selectedRow[0]._id !== item._id) {
+            if (item.parent_category && selectedRow[0]._id === item.parent_category._id) {
+            } else {
+                options.push({ value: item._id, label: item.category })
+            }
         }
     })
 
@@ -49,16 +56,12 @@ const EditCategoryModal = ({ open, handleModal, categories, setCategories, selec
         },
         validationSchema: formSchema,
         onSubmit: (values) => {
-            const update = categories.filter(category => category.id !== selectedRow[0].id)
             const updatedobj = {
-                id: selectedRow[0].id, 
+                _id: selectedRow[0]._id, 
                 category: values.category,
-                parent_category: (values.parentCategory !== '') ? values.parentCategory : null, 
-                stock_qty: (selectedRow[0].stock_qty !== 0) ? selectedRow[0].stock_qty : 0,
-                num_of_products: (selectedRow[0].num_of_products !== 0) ? selectedRow[0].num_of_products : 0
+                parent_category: (values.parentCategory !== '') ? values.parentCategory : null
             }
-            
-            setCategories([updatedobj, ...update])
+            dispatch(updateCategory(updatedobj))
             handleModal()
             formik.resetForm()
         }
@@ -72,7 +75,7 @@ const EditCategoryModal = ({ open, handleModal, categories, setCategories, selec
     useEffect(() => {
         if (selectedRow.length > 0) {
             formik.setFieldValue('category', selectedRow[0].category)
-            formik.setFieldValue('parentCategory', selectedRow[0].parent_category)
+            formik.setFieldValue('parentCategory', (selectedRow[0].parent_category) ? selectedRow[0].parent_category._id : '')
         }
     }, [selectedRow])
 
