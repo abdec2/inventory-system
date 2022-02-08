@@ -3,7 +3,6 @@ import { Fragment, useEffect } from 'react'
 // ** Custom Components
 import Breadcrumbs from '../../../myComponents/breadcrumbs'
 import ProductTable from './ProductTable'
-
 // ** Third Party Components
 import { Row, Col, Button } from 'reactstrap'
 
@@ -17,15 +16,14 @@ import { useDispatch } from 'react-redux'
 const index = () => {
     const dispatch = useDispatch()
     useEffect(() => {
-        document.title = 'AB Sales Pro'
         dispatch(getProducts())
-    })
+    }, [])
   return (
     <Fragment>
       <Breadcrumbs breadCrumbTitle='Product List' breadCrumbParent='Products' breadCrumbActive='Product List' />
       <Row>
         <Col sm='12'>
-            <ProductTable />
+          <ProductTable />
         </Col>
       </Row>
     </Fragment>

@@ -49,7 +49,7 @@ const Sidebar = props => {
 
   return (
     <Fragment>
-      <div
+      <div  
         className={classnames('main-menu menu-fixed menu-accordion menu-shadow', {
           expanded: menuHover || menuCollapsed === false,
           'menu-light': skin !== 'semi-dark' && skin !== 'dark',
@@ -70,7 +70,7 @@ const Sidebar = props => {
             <PerfectScrollbar
               className='main-menu-content'
               options={{ wheelPropagation: false }}
-              onScrollY={container => scrollMenu(container)}
+              onScrollX={container => scrollMenu(container)}
             >
               <ul className='navigation navigation-main'>
                 <VerticalNavMenuItems

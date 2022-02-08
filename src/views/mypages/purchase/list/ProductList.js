@@ -1,13 +1,4 @@
-import { Fragment, useState, forwardRef } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import axios from 'axios'
-import Avatar from '@components/avatar'
-
-// import modals 
-import ImportProductModal from './ImportProductModal'
-import ViewProductModal from './ViewProductModal'
-
-// ** Third Party Components
+import { Fragment, useState } from 'react'
 import ReactPaginate from 'react-paginate'
 import DataTable from 'react-data-table-component'
 import { ChevronDown, Share, Printer, FileText, File, Grid, Copy, Plus, Download, MoreVertical, Edit, Trash, Eye } from 'react-feather'
@@ -26,22 +17,10 @@ import {
     Row,
     Col
 } from 'reactstrap'
-import { useDispatch, useSelector } from 'react-redux'
-import { deleteProduct } from './store/actions'
-import * as alert from '../../../myComponents/AlertMsgs'
+import { Link } from 'react-router-dom'
 
-// ** Bootstrap Checkbox Component
-const BootstrapCheckbox = forwardRef(({ onClick, ...rest }, ref) => (
-    <div className='custom-control custom-checkbox'>
-        <input type='checkbox' className='custom-control-input' ref={ref} {...rest} />
-        <label className='custom-control-label' onClick={onClick} />
-    </div>
-))
-
-const ProductTable = () => {
-    const dispatch = useDispatch()
-    const store = useSelector(state => state.products)
-    const products = store.products1
+const ProductList = () => {
+    const products = []
     const [currentPage, setCurrentPage] = useState(0)
     const [searchValue, setSearchValue] = useState('')
     const [filteredData, setFilteredData] = useState([])
@@ -57,19 +36,11 @@ const ProductTable = () => {
         handleViewModal()
     }
 
-    const history = useHistory()
 
     const handleEditProduct = product => {
-        const routeUrl = `/product/edit/${product._id}`
-        history.push(routeUrl)
     }
 
     const handleDeleteProduct = product => {
-        alert.handleConfirmText().then(result => {
-            if (result.value) {
-                dispatch(deleteProduct(product._id))
-            }
-        })
     }
 
     const handleImportModal = () => setImportModal(!importModal)
@@ -102,7 +73,7 @@ const ProductTable = () => {
             selector: 'product_type',
             sortable: true,
             minWidth: '200px',
-            center: true,
+            center: true, 
             cell: row => (
                 (row.product_type && (
                     row.product_type.type
@@ -138,7 +109,7 @@ const ProductTable = () => {
             selector: 'categories',
             sortable: true,
             minWidth: '200px',
-            center: true,
+            center: true, 
             cell: row => (
                 (row.categories.length > 0) ? row.categories[0].category : 'N/A'
             )
@@ -148,7 +119,7 @@ const ProductTable = () => {
             selector: 'qty',
             sortable: true,
             minWidth: '50px',
-            center: true,
+            center: true, 
             cell: row => (
                 row.qty || 0
             )
@@ -158,7 +129,7 @@ const ProductTable = () => {
             selector: 'unit',
             sortable: true,
             minWidth: '100px',
-            center: true,
+            center: true, 
             cell: row => (
                 row.unit && (
                     row.unit.unit
@@ -256,8 +227,8 @@ const ProductTable = () => {
         if (value.length) {
             updatedData = products.filter(item => {
                 const startsWith =
-                    item.sku.toLowerCase().startsWith(value.toLowerCase()) ||
-                    item.label.toLowerCase().startsWith(value.toLowerCase())
+                item.sku.toLowerCase().startsWith(value.toLowerCase()) ||
+                item.label.toLowerCase().startsWith(value.toLowerCase())
 
                 const includes =
                     item.sku.toLowerCase().includes(value.toLowerCase()) ||
@@ -304,7 +275,6 @@ const ProductTable = () => {
             containerClassName='pagination react-paginate separated-pagination pagination-sm justify-content-end pr-1 mt-1'
         />
     )
-
     return (
         <Fragment>
             <Card>
@@ -325,12 +295,12 @@ const ProductTable = () => {
                         <Link to='/product/add'>
                             <Button color='primary'>
                                 <Plus size={15} />
-                                <span className='align-middle ml-50'>Add Products</span>
+                                <span className='align-middle ml-50'>Add Purchase</span>
                             </Button>
                         </Link>
                         <Button className='mt-1 mt-md-0 ml-md-1' color='info' onClick={handleImportModal}>
                             <Download size={15} />
-                            <span className='align-middle ml-50'>Import Products</span>
+                            <span className='align-middle ml-50'>Import Purchases</span>
                         </Button>
                     </div>
                 </CardHeader>
@@ -352,7 +322,6 @@ const ProductTable = () => {
                 <DataTable
                     noHeader
                     pagination
-                    // selectableRows
                     columns={columns}
                     paginationPerPage={7}
                     className='react-dataTable'
@@ -360,14 +329,12 @@ const ProductTable = () => {
                     paginationDefaultPage={currentPage + 1}
                     paginationComponent={CustomPagination}
                     data={searchValue.length ? filteredData : products}
-                // selectableRowsComponent={BootstrapCheckbox}
                 />
             </Card>
-            <ImportProductModal open={importModal} handleModal={handleImportModal} />
-            <ViewProductModal open={viewModal} handleModal={handleViewModal} selectedRow={selectedRow} />
 
         </Fragment>
     )
+
 }
 
-export default ProductTable
+export default ProductList

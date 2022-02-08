@@ -52,13 +52,15 @@ const products = [
                 id: 'adjustment-list',
                 title: 'Adjustment List',
                 icon: <Circle size={20} />,
-                navLink: '/product/adjustment'
+                navLink: '/product/adjustment', 
+                disabled: true
             }, 
             {
                 id: 'add-adjustment',
                 title: 'Add Adjustment',
                 icon: <Circle size={20} />,
-                navLink: '/product/adjustment/add'
+                navLink: '/product/adjustment/add', 
+                disabled: true
             }
         ]
     }
@@ -306,6 +308,9 @@ const report = [
 
 const pickNpack = [
     {
+        header: 'For Shalooh'
+    },
+    {
         id:'pick-pack',
         title: 'Pick N Pack',
         icon: <Package size={20} />, 
@@ -379,13 +384,13 @@ export default [
     ...products, 
     ...purchase,  
     ...sales, 
-    ...expenses, 
-    ...quotation, 
-    ...transfer, 
-    ...returns, 
+    // ...expenses, 
+    // ...quotation, 
+    // ...transfer, 
+    // ...returns, 
     ...people, 
-    ...report,
-    ...order, 
+    // ...report,
+    // ...order, 
     ...pickNpack, 
     ...settings
 ]
