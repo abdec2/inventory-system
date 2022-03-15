@@ -13,6 +13,7 @@ import { toast, Slide } from 'react-toastify'
 import { getHomeRouteForLoggedInUser } from '@utils'
 import Avatar from '@components/avatar'
 import { Coffee } from 'react-feather'
+import { useAbility } from '@casl/react'
 
 const ToastContent = ({ name, role }) => (
     <Fragment>
@@ -32,7 +33,7 @@ const LoginV2 = () => {
     const [skin, setSkin] = useSkin()
     const [password, setPassword] = useState('')
     const [email, setEmail] = useState('')
-    const ability = useContext(AbilityContext)
+    const ability = useAbility(AbilityContext)
     const dispatch = useDispatch()
     const history = useHistory()
 
@@ -44,20 +45,20 @@ const LoginV2 = () => {
             auth
                 .Login({ email, password })
                 .then(res => {
-                    const data = res.data
-                    const userAbility = (data.user.role.type === 'admin') ? [{ action: "manage", subject: "all" }] : []
-                    data.ability = userAbility
-                    dispatch(handleLogin(data))
-                    ability.update(userAbility)
-                    history.push(getHomeRouteForLoggedInUser(res.data.user.role.name))
-                    toast.success(
-                        <ToastContent name={data.user.username} role={data.user.role.name} />,
-                        { transition: Slide, hideProgressBar: true, autoClose: 2000 }
-                    )
-
+                    if (res.hasOwnProperty('data')) {
+                        const data = res.data
+                        const userAbility = (data.user.role.type === 'admin') ? [{ action: "manage", subject: "all" }] : []
+                        data.ability = userAbility
+                        dispatch(handleLogin(data))
+                        ability.update(userAbility)
+                        history.push(getHomeRouteForLoggedInUser(res.data.user.role.name))
+                        toast.success(
+                            <ToastContent name={data.user.username} role={data.user.role.name} />,
+                            { transition: Slide, hideProgressBar: true, autoClose: 2000 }
+                        )
+                    }
                 })
-                .catch(err => console.log(err))
-
+                .catch(err => console.log('bad login'))
         }
     }
 
